@@ -1,0 +1,3 @@
+alias Exgames
+
+Exgames.run
