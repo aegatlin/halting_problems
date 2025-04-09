@@ -49,4 +49,13 @@ defmodule Exgames.IntegersTest do
     assert E.Integers.totient(2) == 1
     assert E.Integers.totient(9) == 6
   end
+
+  test "partition_function/1" do
+    assert E.Integers.partition_function(5) == 7
+  end
+
+  test "partition_function_list/1" do
+    assert E.Integers.partition_function_list(3) == [[1, 1, 1], [1, 2], [3]]
+    assert E.Integers.partition_function_list(4) == [[1, 1, 1, 1], [1, 1, 2], [2, 2], [1, 3], [4]]
+  end
 end

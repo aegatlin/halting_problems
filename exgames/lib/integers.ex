@@ -184,8 +184,7 @@ defmodule Exgames.Integers do
   exceeding n which are relatively prime to n.
 
   There are more efficient methods that avoid division if this becomes a
-  bottleneck. One place to look is PE#72 solution pdf. Additionally, MathWorld
-  and Wikipedia.
+  bottleneck. See Wolfram MathWorld and Wikipedia.
   """
   def totient(n) do
     E.Integers.Primes.prime_factors(n)
@@ -232,18 +231,22 @@ defmodule Exgames.Integers do
 
   https://en.wikipedia.org/wiki/Partition_function_(number_theory)
   """
-  def permutation_function(n) do
-    all_ones = fn list -> Enum.all?(list, &(&1 == 1)) end
+  def partition_function_list(n) do
+    all_ones? = fn list -> Enum.all?(list, &(&1 == 1)) end
 
-    start = [1, n - 1]
+    start = [n]
+    # other starts exclude certain partitions, e.g., this one exclude the [n]
+    # partition
+    # start = [1, n - 1]
 
+    # This should be a Stream if it's unbounded
     1..1_000_000_000_000
     |> Enum.reduce_while({start, [start]}, fn _elem, acc ->
       {cur, all} = acc
-      next = step(cur)
+      next = p_list_step(cur)
       all = [next | all]
 
-      if all_ones.(next) do
+      if all_ones?.(next) do
         {:halt, {next, all}}
       else
         {:cont, {next, all}}
@@ -252,33 +255,33 @@ defmodule Exgames.Integers do
     |> elem(1)
   end
 
-  defp step([h | t] = list) do
+  defp p_list_step([h | t] = list) do
     sum = Enum.sum(list)
 
     if h != 1 do
-      fill(t, sum, h - 1)
+      p_list_fill(t, sum, h - 1)
     else
       sub_list = Enum.drop_while(list, &(&1 == 1))
       [h | t] = sub_list
-      fill(t, sum, h - 1)
+      p_list_fill(t, sum, h - 1)
     end
   end
 
-  defp fill(sub_list, _sum, 0), do: sub_list
+  defp p_list_fill(sub_list, _sum, 0), do: sub_list
 
-  defp fill(sub_list, sum, try) do
+  defp p_list_fill(sub_list, sum, try) do
     sub_sum = Enum.sum(sub_list)
-    idk = sub_sum + try
+    sub_sum_try = sub_sum + try
 
     cond do
-      idk > sum ->
-        fill(sub_list, sum, try - 1)
+      sub_sum_try > sum ->
+        p_list_fill(sub_list, sum, try - 1)
 
-      idk == sum ->
+      sub_sum_try == sum ->
         [try | sub_list]
 
-      idk < sum ->
-        fill([try | sub_list], sum, try)
+      sub_sum_try < sum ->
+        p_list_fill([try | sub_list], sum, try)
     end
   end
 
@@ -286,34 +289,34 @@ defmodule Exgames.Integers do
   P(n) is the permutation function for integer n. This is the Ramanujan
   approximation function of P(n).
   """
-  def p_approx(n) do
+  def partition_function_approx(n) do
     c = 1 / (4 * n * :math.sqrt(3))
     d = :math.exp(:math.pi() * :math.sqrt(2 * n / 3))
     c * d
   end
 
   @doc """
-  This is P(n) the permutation function for integer n.
+  This is p(n) the partition function for integer n.
   """
-  def p(n) when n < 0, do: 0
-  def p(0), do: 1
-  def p(1), do: 1
+  def partition_function(n) when n < 0, do: 0
+  def partition_function(0), do: 1
+  def partition_function(1), do: 1
 
-  def p(n) do
+  def partition_function(n) do
     1..n
     |> Enum.map_reduce(%{}, fn k, pmap ->
-      aval = a(k)
-      bval = b(k, n)
-      cval = c(k, n)
+      aval = partition_function_a(k)
+      bval = partition_function_b(k, n)
+      cval = partition_function_c(k, n)
 
       pmap =
         Map.put_new_lazy(pmap, bval, fn ->
-          p(bval)
+          partition_function(bval)
         end)
 
       pmap =
         Map.put_new_lazy(pmap, cval, fn ->
-          p(cval)
+          partition_function(cval)
         end)
 
       pb = Map.get(pmap, bval)
@@ -326,11 +329,11 @@ defmodule Exgames.Integers do
     |> Enum.sum()
   end
 
-  defp a(k) do
+  defp partition_function_a(k) do
     -1 ** (k + 1)
   end
 
-  defp b(k, n) do
+  defp partition_function_b(k, n) do
     y = 3 * k - 1
     y = y * (k / 2)
     y = n - y
@@ -344,7 +347,7 @@ defmodule Exgames.Integers do
     yint
   end
 
-  defp c(k, n) do
+  defp partition_function_c(k, n) do
     y = 3 * k + 1
     y = y * (k / 2)
     y = n - y
