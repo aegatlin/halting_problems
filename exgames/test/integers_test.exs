@@ -50,8 +50,9 @@ defmodule Exgames.IntegersTest do
     assert E.Integers.totient(9) == 6
   end
 
-  test "partition_function/1" do
-    assert E.Integers.partition_function(5) == 7
+  test "generalized_partition_function/1" do
+    assert E.Integers.generalized_partition_function(5) == 7
+    assert E.Integers.generalized_partition_function(15) == 176
   end
 
   test "partition_function_list/1" do

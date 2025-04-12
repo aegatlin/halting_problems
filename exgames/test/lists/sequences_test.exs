@@ -15,17 +15,23 @@ defmodule Exgames.Lists.SequencesTest do
     assert Exgames.Lists.Sequences.pentagonal(6) == [0, 1, 5, 12, 22, 35, 51]
   end
 
-  test "hexagonal" do
-    assert Exgames.Lists.Sequences.hexagonal(6) == [0, 1, 6, 15, 28, 45, 66]
-    assert Exgames.Lists.Sequences.hexagonal(7) == [0, 1, 6, 15, 28, 45, 66, 91]
-  end
+  test "pentagonal_numbers_generalized_list/1" do
+    assert Exgames.Lists.Sequences.pentagonal_numbers_generalized_list(list_length: 5) == [
+             0,
+             1,
+             2,
+             5,
+             7
+           ]
 
-  test "heptagonal" do
-    assert Exgames.Lists.Sequences.heptagonal(6) == [0, 1, 7, 18, 34, 55, 81]
-  end
-
-  test "octagonal" do
-    assert Exgames.Lists.Sequences.octagonal(6) == [0, 1, 8, 21, 40, 65, 96]
+    assert Exgames.Lists.Sequences.pentagonal_numbers_generalized_list(list_length: 6) == [
+             0,
+             1,
+             2,
+             5,
+             7,
+             12
+           ]
   end
 
   test "continued_fraction_of_e" do

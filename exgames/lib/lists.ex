@@ -108,8 +108,6 @@ defmodule Exgames.Lists do
   def square_sequence(n), do: E.Lists.Sequences.square(n)
   def pentagonal_sequence(n), do: E.Lists.Sequences.pentagonal(n)
   def hexagonal_sequence(n), do: E.Lists.Sequences.hexagonal(n)
-  def heptagonal_sequence(n), do: E.Lists.Sequences.heptagonal(n)
-  def octagonal_sequence(n), do: E.Lists.Sequences.octagonal(n)
 
   # n < d
   def reduce_fraction([n, d]) do

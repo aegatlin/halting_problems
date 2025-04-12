@@ -5,7 +5,6 @@ defmodule Exgames.Lists.Sequences do
   Simple sequences can be generated using ranges and Enum.to_list, e.g., 2-digit
   even numbers are `Enum.to_list(100..998//2)
   """
-  alias Exgames, as: E
 
   @doc ~S"""
   Returns the fibonacci sequence as a list of length `n`.
@@ -100,41 +99,50 @@ defmodule Exgames.Lists.Sequences do
     pentagonal([next | list], max)
   end
 
+  @doc ~S"""
+  https://oeis.org/A000326
+
+  ## Examples
+
+    iex> Exgames.Lists.Sequences.pentagonal_numbers_list(list_length: 10)
+    [0, 1, 5, 12, 22, 35, 51, 70, 92, 117]
+  """
+  def pentagonal_numbers_list(opts \\ []) do
+    list_length = Keyword.get(opts, :list_length, 100)
+
+    1..(list_length - 1)
+    |> Enum.reduce([0], fn n, [h | _t] = acc ->
+      [h + 3 * n - 2 | acc]
+    end)
+    |> Enum.reverse()
+  end
+
+  @doc ~S"""
+  https://oeis.org/A001318
+
+  ## Examples
+
+    iex> Exgames.Lists.Sequences.pentagonal_numbers_generalized_list(list_length: 10)
+    [0, 1, 2, 5, 7, 12, 15, 22, 26, 35]
+  """
+  def pentagonal_numbers_generalized_list(opts \\ []) do
+    list_length = Keyword.get(opts, :list_length, 100)
+
+    1..div(list_length, 2)
+    |> Enum.reduce([0], fn n, acc ->
+      pos = div(3 * n ** 2 - n, 2)
+      neg = div(3 * -n ** 2 - -n, 2)
+      [neg | [pos | acc]]
+    end)
+    |> Enum.reverse()
+    |> Enum.take(list_length)
+  end
+
   @doc """
   https://oeis.org/A000384
   """
   def hexagonal(n) do
     [h | t] = triangle(n * 2)
     [h | t |> Enum.take_every(2)]
-  end
-
-  @doc """
-  https://oeis.org/A000566
-  """
-  def heptagonal(n), do: heptagonal([], n)
-
-  def heptagonal(list, max) do
-    cur = length(list)
-
-    if cur < max + 1 do
-      heptagonal([E.Integers.heptagonal_number(cur) | list], max)
-    else
-      Enum.reverse(list)
-    end
-  end
-
-  @doc """
-  https://oeis.org/A000567
-  """
-  def octagonal(n), do: octagonal([], n)
-
-  def octagonal(list, max) do
-    cur = length(list)
-
-    if cur < max + 1 do
-      octagonal([E.Integers.octagonal_number(cur) | list], max)
-    else
-      Enum.reverse(list)
-    end
   end
 end

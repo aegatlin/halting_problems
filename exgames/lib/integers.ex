@@ -225,11 +225,17 @@ defmodule Exgames.Integers do
 
   @doc """
   This is the list of ways you can represent n as a sum of integers, excluding
-  [n]. That is, it is off by one with respect to P(n) itself.
+  [n]. That is, it is off by one with respect to P(n) itself. This will generate
+  the list of all partitions and so will be inoperably inefficient for large `n`.
 
   https://mathworld.wolfram.com/PartitionFunctionP.html
 
   https://en.wikipedia.org/wiki/Partition_function_(number_theory)
+
+  ## Examples
+
+    iex> E.Integers.partition_function_list(3)
+    [[1, 1, 1], [1, 2], [3]]
   """
   def partition_function_list(n) do
     all_ones? = fn list -> Enum.all?(list, &(&1 == 1)) end
@@ -286,7 +292,7 @@ defmodule Exgames.Integers do
   end
 
   @doc """
-  P(n) is the permutation function for integer n. This is the Ramanujan
+  p(n), i.e., the partition function for integer n. This is the Ramanujan
   approximation function of P(n).
   """
   def partition_function_approx(n) do
@@ -295,69 +301,62 @@ defmodule Exgames.Integers do
     c * d
   end
 
-  @doc """
-  This is p(n) the partition function for integer n.
+  @doc ~S"""
+  The partition function of `n` calculated using the pentagonal number
+  theorem's generating function.
+
+  https://en.wikipedia.org/wiki/Pentagonal_number_theorem
+
+  https://mathworld.wolfram.com/PartitionFunctionP.html
+
+  https://en.wikipedia.org/wiki/Partition_function_(number_theory)
+
+  ## Examples
+
+    iex> Exgames.Integers.generalized_partition_function(10)
+    42
   """
-  def partition_function(n) when n < 0, do: 0
-  def partition_function(0), do: 1
-  def partition_function(1), do: 1
+  def generalized_partition_function(n) do
+    generalized_partition_function_sequence(n)
+    |> List.last()
+  end
 
-  def partition_function(n) do
+  @doc ~S"""
+  The partition number, p(n), as a sequence up to max `n` starting with `n = 0`.
+
+  ## Examples
+
+    iex> Exgames.Integers.generalized_partition_function_sequence(10)
+    [1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42]
+  """
+  def generalized_partition_function_sequence(n) do
     1..n
-    |> Enum.map_reduce(%{}, fn k, pmap ->
-      aval = partition_function_a(k)
-      bval = partition_function_b(k, n)
-      cval = partition_function_c(k, n)
-
-      pmap =
-        Map.put_new_lazy(pmap, bval, fn ->
-          partition_function(bval)
-        end)
-
-      pmap =
-        Map.put_new_lazy(pmap, cval, fn ->
-          partition_function(cval)
-        end)
-
-      pb = Map.get(pmap, bval)
-      pc = Map.get(pmap, cval)
-      pkn = aval * (pb + pc)
-
-      {pkn, pmap}
+    |> Enum.reduce([1], fn _n, acc ->
+      generalized_partition_function_sequence_step(acc)
     end)
-    |> Kernel.elem(0)
-    |> Enum.sum()
+    |> Enum.reverse()
   end
 
-  defp partition_function_a(k) do
-    -1 ** (k + 1)
-  end
+  defp generalized_partition_function_sequence_step(p_list) do
+    n = length(p_list)
 
-  defp partition_function_b(k, n) do
-    y = 3 * k - 1
-    y = y * (k / 2)
-    y = n - y
+    pn =
+      Stream.iterate(1, &if(&1 > 0, do: -&1, else: -&1 + 1))
+      |> Enum.take(n)
+      |> Enum.reduce_while([], fn k, acc ->
+        sign = -1 ** (k - 1)
+        gk = div(k * (3 * k - 1), 2)
+        pnext = Enum.at(p_list, gk - 1, nil)
 
-    yint = Kernel.trunc(y)
+        if is_nil(pnext) do
+          {:halt, acc}
+        else
+          pnext_sign = sign * pnext
+          {:cont, [floor(pnext_sign) | acc]}
+        end
+      end)
+      |> Enum.sum()
 
-    if y != yint do
-      exit(:bad_math)
-    end
-
-    yint
-  end
-
-  defp partition_function_c(k, n) do
-    y = 3 * k + 1
-    y = y * (k / 2)
-    y = n - y
-
-    yint = Kernel.trunc(y)
-
-    if y != yint do
-      exit(:bad_math)
-    end
-
-    yint
+    [pn | p_list]
   end
 end
