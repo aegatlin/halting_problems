@@ -316,8 +316,8 @@ defmodule Exgames.Integers do
     iex> Exgames.Integers.generalized_partition_function(10)
     42
   """
-  def generalized_partition_function(n) do
-    generalized_partition_function_sequence(n)
+  def generalized_partition_function(n, opts \\ []) do
+    generalized_partition_function_sequence(n, opts)
     |> List.last()
   end
 
@@ -329,15 +329,23 @@ defmodule Exgames.Integers do
     iex> Exgames.Integers.generalized_partition_function_sequence(10)
     [1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42]
   """
-  def generalized_partition_function_sequence(n) do
+  def generalized_partition_function_sequence(n, opts \\ []) do
     1..n
     |> Enum.reduce([1], fn _n, acc ->
-      generalized_partition_function_sequence_step(acc)
+      generalized_partition_function_sequence_step(acc, opts)
     end)
     |> Enum.reverse()
   end
 
-  defp generalized_partition_function_sequence_step(p_list) do
+  def generalized_partition_function_sequence_stream(opts \\ []) do
+    Stream.unfold([1], fn [h | _t] = acc ->
+      {{length(acc) - 1, h}, generalized_partition_function_sequence_step(acc, opts)}
+    end)
+  end
+
+  defp generalized_partition_function_sequence_step(p_list, opts) do
+    mod = Keyword.get(opts, :mod)
+
     n = length(p_list)
 
     pn =
@@ -351,11 +359,18 @@ defmodule Exgames.Integers do
         if is_nil(pnext) do
           {:halt, acc}
         else
-          pnext_sign = sign * pnext
-          {:cont, [floor(pnext_sign) | acc]}
+          pnext_sign = (sign * pnext) |> floor()
+          {:cont, [pnext_sign | acc]}
         end
       end)
       |> Enum.sum()
+
+    pn =
+      if mod do
+        Integer.mod(pn, mod)
+      else
+        pn
+      end
 
     [pn | p_list]
   end
