@@ -11,7 +11,7 @@ defmodule Exgames.Combinatorics do
   Allegedly pascal's triangle is a more efficient calculation but I have not
   observed this myself.
   """
-  # This is incoherent and stipulated 0
+  # `k > n` is incoherent and stipulated 0
   def choose(n, k) when k > n, do: 0
   def choose(n, k) when k == n, do: 1
 
