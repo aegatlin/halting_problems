@@ -1,47 +1,30 @@
+mod math;
 mod trig;
 
 fn main() {
-    let points = generate_all_points();
-    let point_pairs = generate_all_pairs(&points);
-    let triangles = generate_all_triangles(&point_pairs);
+    let mut best_count_diff: u128 = 1_000_000;
+    let target_count: u128 = 2_000_000;
 
-    let mut count = 0;
-    for tri in triangles {
-        if tri.is_right_triangle() {
-            println!("{:?}", tri);
-            count += 1;
-        }
-    }
+    for x in 1..100 {
+        for y in 1..x {
+            let count = sub_rectangles_count(x, y);
+            let count_diff = target_count.abs_diff(count);
+            if count_diff < best_count_diff {
+                best_count_diff = count_diff;
 
-    println!("Number of right triangles: {}", count / 2);
-}
-
-fn generate_all_triangles(point_pairs: &[(trig::Point, trig::Point)]) -> Vec<trig::Triangle> {
-    point_pairs
-        .iter()
-        .map(|&(p, q)| trig::Triangle::new(p, q))
-        .collect()
-}
-
-fn generate_all_points() -> Vec<trig::Point> {
-    let mut points = Vec::new();
-
-    for y in 0..=50 {
-        for x in 0..=50 {
-            // ignore origin since that will be an implicit 3rd point
-            if x != 0 || y != 0 {
-                points.push(trig::Point::new_from_i32(x, y));
+                println!(
+                    "x: {}, y: {}, count: {}, best_count_diff: {}, area: {}",
+                    x,
+                    y,
+                    count,
+                    best_count_diff,
+                    x * y
+                );
             }
         }
     }
-
-    points
 }
 
-fn generate_all_pairs(points: &[trig::Point]) -> Vec<(trig::Point, trig::Point)> {
-    points
-        .iter()
-        .copied()
-        .flat_map(|p| points.iter().copied().map(move |q| (p, q)))
-        .collect()
+fn sub_rectangles_count(x: u128, y: u128) -> u128 {
+    math::choose(x + 1, 2).unwrap() * math::choose(y + 1, 2).unwrap()
 }
