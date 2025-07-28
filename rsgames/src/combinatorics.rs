@@ -5,11 +5,7 @@ pub enum MathError {
     InvalidInput(String),
 }
 
-pub fn factorial(n: u128) -> u128 {
-    (1..=n).product()
-}
-
-/// aka the binomial coeffecient
+/// This is the binomial coeffecient
 pub fn choose(n: u128, k: u128) -> Result<u128, MathError> {
     if k > n {
         return Err(MathError::InvalidInput(format!(
@@ -28,15 +24,13 @@ pub fn choose(n: u128, k: u128) -> Result<u128, MathError> {
     Ok(dividend.div(divisor))
 }
 
+pub fn factorial(n: u128) -> u128 {
+    (1..=n).product()
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
-
-    #[test]
-    fn test_factorial() {
-        assert_eq!(factorial(5), 120);
-        assert_eq!(factorial(13), 6_227_020_800);
-    }
 
     #[test]
     fn test_choose() {
@@ -56,5 +50,11 @@ mod test {
             err,
             MathError::InvalidInput("n choose k cannot have k > n, n: 10, k: 20".to_string())
         )
+    }
+
+    #[test]
+    fn test_factorial() {
+        assert_eq!(factorial(5), 120);
+        assert_eq!(factorial(13), 6_227_020_800);
     }
 }
