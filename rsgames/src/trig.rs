@@ -1,12 +1,12 @@
 use std::{f64::consts::PI, ops::Div};
 
 #[derive(Debug, Clone, Copy)]
-pub struct Triangle {
+pub struct Triangle2Points {
     p: Point,
     q: Point,
 }
 
-impl Triangle {
+impl Triangle2Points {
     /// The third point is the origin (0, 0).
     pub fn new(p: Point, q: Point) -> Self {
         Self { p, q }
@@ -98,9 +98,8 @@ impl Point {
 
 #[cfg(test)]
 mod tests {
-    use std::{f64::consts::PI, ops::Div};
-
     use super::*;
+    use std::{f64::consts::PI, ops::Div};
 
     #[test]
     fn test_theta() {
@@ -131,20 +130,20 @@ mod tests {
 
     #[test]
     fn test_triangle() {
-        let tri = Triangle::new(Point::new_from_i32(5, 0), Point::new_from_i32(5, 5));
+        let tri = Triangle2Points::new(Point::new_from_i32(5, 0), Point::new_from_i32(5, 5));
         assert!(tri.is_right_triangle());
 
-        let tri2 = Triangle::new(Point::new_from_i32(5, 0), Point::new_from_i32(6, 5));
+        let tri2 = Triangle2Points::new(Point::new_from_i32(5, 0), Point::new_from_i32(6, 5));
         assert!(!tri2.is_right_triangle());
     }
 
     #[test]
     fn test_triangle_is_right_angle() {
-        assert!(Triangle::is_right_angle(PI / 2.0));
-        assert!(Triangle::is_right_angle(1.57079633));
-        assert!(Triangle::is_right_angle(1.57079634));
-        assert!(Triangle::is_right_angle(1.570796));
-        assert!(!Triangle::is_right_angle(2.0));
-        assert!(!Triangle::is_right_angle(1.57797));
+        assert!(Triangle2Points::is_right_angle(PI / 2.0));
+        assert!(Triangle2Points::is_right_angle(1.57079633));
+        assert!(Triangle2Points::is_right_angle(1.57079634));
+        assert!(Triangle2Points::is_right_angle(1.570796));
+        assert!(!Triangle2Points::is_right_angle(2.0));
+        assert!(!Triangle2Points::is_right_angle(1.57797));
     }
 }
