@@ -1,5 +1,5 @@
 def main():
-    print("Hello from pyai2!")
+    print("Hello!")
 
 
 if __name__ == "__main__":
