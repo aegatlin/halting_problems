@@ -1,28 +1,36 @@
-use rsgames::words::WordProperties;
+fn is_bouncy(mut n: u64) -> bool {
+    let mut increasing = true;
+    let mut decreasing = true;
+    let mut prev = (n % 10) as i32;
+    n /= 10;
+    while n > 0 {
+        let d = (n % 10) as i32;
+        if d > prev {
+            decreasing = false;
+        }
+        if d < prev {
+            increasing = false;
+        }
+        if !increasing && !decreasing {
+            return true;
+        }
+        prev = d;
+        n /= 10;
+    }
+    false
+}
 
 fn main() {
-    let contents = rsgames::files::read_file("0098_words.txt");
-    let words = rsgames::strings::csv_string_to_list(&contents);
-    let words2: Vec<&str> = words
-        .into_iter()
-        .map(|word| word.trim_matches('"'))
-        .collect();
-
-    for word in &words2 {
-        let mut anagrams: Vec<&str> = Vec::new();
-
-        for other_word in &words2 {
-            if word == other_word {
-                continue;
-            }
-
-            if word.is_anagram(other_word) {
-                anagrams.push(other_word);
-            }
+    let mut bouncy: u64 = 0;
+    let mut n: u64 = 0;
+    loop {
+        n += 1;
+        if is_bouncy(n) {
+            bouncy += 1;
         }
-
-        if anagrams.len() > 0 {
-            println!("{}: {:?}", word, anagrams);
+        if bouncy * 100 == n * 99 {
+            println!("{}", n);
+            break;
         }
     }
 }
